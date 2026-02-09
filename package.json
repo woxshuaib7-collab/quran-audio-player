@@ -1,4 +1,11 @@
 {
+  "name": "quran-audio-player",
+  "version": "1.0.0",
+  "description": "Quran Audio Player App",
+  "main": "index.html",
+  "scripts": {
+    "build": "mkdir -p www"
+  },
   "dependencies": {
     "@capacitor/android": "^8.0.2",
     "@capacitor/cli": "^8.0.2",
