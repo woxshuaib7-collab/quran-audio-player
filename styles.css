@@ -1,0 +1,768 @@
+/* ===== Quran Audio Player — Modern Premium Glassmorphism ===== */
+:root {
+  --gold: #c9a227;
+  --gold-light: #e6c84a;
+  --gold-dim: #8b7312;
+  --gold-glow: rgba(201, 162, 39, 0.35);
+  --emerald-950: #022c22;
+  --emerald-900: #064e3b;
+  --emerald-800: #065f46;
+  --emerald-700: #047857;
+  --glass-bg: rgba(6, 62, 50, 0.45);
+  --glass-border: rgba(201, 162, 39, 0.18);
+  --glass-glow: rgba(201, 162, 39, 0.08);
+  --text-primary: #f0fdf4;
+  --text-secondary: rgba(240, 253, 244, 0.82);
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.25);
+  --shadow-glow: 0 0 24px var(--gold-glow);
+  --player-height: 88px;
+  --header-height: 150px;
+  --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+  font-size: 16px;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100vh;
+  height: auto !important;
+  font-family: 'Tajawal', sans-serif;
+  color: var(--text-primary);
+  position: relative;
+  overflow-x: hidden;
+  line-height: 1.65;
+  letter-spacing: 0.02em;
+  margin: 0;
+  padding: 0;
+}
+
+/* Deep emerald gradient — fixed, doesn't affect page length */
+.bg-gradient {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    165deg,
+    var(--emerald-950) 0%,
+    var(--emerald-900) 25%,
+    #052e26 50%,
+    var(--emerald-900) 75%,
+    var(--emerald-950) 100%
+  );
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* Background image on body — fixed so it doesn't affect page length */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('https://images.unsplash.com/photo-1564769625905-eb2d2a0e6f21?w=1920&q=80');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  opacity: 0.12;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Glassmorphism base */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 0 0 1px var(--glass-glow), var(--shadow-soft);
+}
+
+/* Header */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 1.25rem 1.5rem;
+  min-height: var(--header-height);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.logo-ar {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--gold-light);
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+}
+
+.logo-en {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.12em;
+}
+
+/* Floating search bar */
+.search-wrap.floating {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow-soft);
+  border-radius: 16px;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.search-wrap.floating:focus-within {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft), 0 0 0 3px var(--glass-glow), 0 0 28px var(--gold-glow);
+}
+
+.search-wrap .search-icon {
+  position: absolute;
+  right: 1.1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23c9a227' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'/%3E%3C/svg%3E") center/contain no-repeat;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.9rem 1rem 0.9rem 2.9rem;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  color: var(--text-primary);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px var(--gold-glow);
+}
+
+/* Main — no fixed height; adapts to content; padding-bottom for player clearance */
+.main {
+  min-height: 100vh;
+  height: auto;
+  padding: 1.5rem;
+  padding-bottom: calc(var(--player-height) + 16px);
+  box-sizing: border-box;
+}
+
+.section {
+  max-width: 920px;
+  margin: 0 auto;
+  height: auto;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+}
+
+.reciters-section,
+.surahs-section {
+  height: auto;
+  min-height: auto;
+  margin-bottom: 0;
+}
+
+.surahs-section-inner {
+  min-height: auto;
+  height: auto;
+}
+
+.section.hidden {
+  display: none !important;
+  position: absolute;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.section-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 1.25rem;
+  text-align: center;
+  letter-spacing: 0.03em;
+  line-height: 1.4;
+}
+
+/* Reciters grid — hover scale + shadow glow */
+.reciters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.reciter-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 0 0 1px var(--glass-glow), var(--shadow-soft);
+  border-radius: 16px;
+  padding: 1.15rem;
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+  text-align: center;
+}
+
+.reciter-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 0 1px var(--glass-glow), var(--shadow-soft), var(--shadow-glow);
+  border-color: rgba(201, 162, 39, 0.35);
+}
+
+.reciter-card .name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+
+/* Loading state — beautiful spinner + skeleton */
+.loading-state {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  color: var(--text-secondary);
+}
+
+.spinner-beautiful {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--glass-border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.9s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+.skeleton-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 640px;
+}
+
+.skeleton-card {
+  height: 72px;
+  background: linear-gradient(
+    90deg,
+    rgba(201, 162, 39, 0.06) 0%,
+    rgba(201, 162, 39, 0.12) 50%,
+    rgba(201, 162, 39, 0.06) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton 1.5s ease-in-out infinite;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+}
+
+@keyframes skeleton {
+  0%, 100% { background-position: 200% 0; }
+  50% { background-position: -200% 0; }
+}
+
+/* Back button + ripple */
+.back-btn {
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--gold);
+  background: var(--glass-bg);
+  backdrop-filter: blur(15px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 0.6rem 1.1rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.back-btn:hover {
+  background: rgba(201, 162, 39, 0.12);
+  color: var(--gold-light);
+  border-color: var(--gold);
+  box-shadow: 0 0 16px var(--gold-glow);
+}
+
+.back-arrow {
+  font-size: 1.1rem;
+}
+
+/* Surahs section fade-in */
+.surahs-section-inner.fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Surah list — glass tiles, number in gold circle */
+.surahs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.85rem;
+}
+
+.surah-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 0 0 1px var(--glass-glow);
+  border-radius: 14px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.surah-card:hover:not(.disabled) {
+  transform: scale(1.02);
+  border-color: rgba(201, 162, 39, 0.4);
+  box-shadow: 0 0 0 1px var(--glass-glow), 0 0 20px var(--gold-glow);
+}
+
+.surah-card.playing {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px var(--gold-glow), 0 0 24px var(--gold-glow);
+  background: rgba(201, 162, 39, 0.12);
+}
+
+.surah-card .number-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--gold-light);
+  flex-shrink: 0;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.surah-card.playing .number-circle {
+  box-shadow: 0 0 12px var(--gold-glow);
+}
+
+.surah-card .name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+}
+
+/* Playing indicator — animated icon */
+.surah-card .playing-indicator {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  width: 24px;
+  height: 24px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.surah-card.playing .playing-indicator {
+  display: flex;
+}
+
+.playing-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 14px;
+}
+
+.playing-bars span {
+  width: 4px;
+  background: var(--gold);
+  border-radius: 2px;
+  animation: playingBars 0.6s ease-in-out infinite alternate;
+}
+
+.playing-bars span:nth-child(1) { height: 8px; animation-delay: 0s; }
+.playing-bars span:nth-child(2) { height: 12px; animation-delay: 0.15s; }
+.playing-bars span:nth-child(3) { height: 6px; animation-delay: 0.3s; }
+.playing-bars span:nth-child(4) { height: 10px; animation-delay: 0.45s; }
+
+@keyframes playingBars {
+  from { transform: scaleY(0.5); }
+  to { transform: scaleY(1); }
+}
+
+.surah-card.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.surah-card.disabled .number-circle {
+  border-color: var(--glass-border);
+  color: var(--text-secondary);
+}
+
+/* Player — floating pill + progress bar */
+.player-outer {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 2rem);
+  max-width: 640px;
+  z-index: 200;
+}
+
+.audio-player.pill {
+  border-radius: 999px;
+  padding: 0 1.5rem 0 0.5rem;
+  min-height: var(--player-height);
+  box-shadow: 0 0 0 1px var(--glass-glow), 0 12px 40px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+}
+
+.progress-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 999px 999px 0 0;
+  overflow: hidden;
+}
+
+.progress-track {
+  height: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  position: relative;
+  border-radius: inherit;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--gold);
+  border-radius: inherit;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 8px var(--gold-glow);
+}
+
+.player-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 4px;
+}
+
+.now-playing {
+  flex: 1;
+  min-width: 0;
+  padding-right: 0.5rem;
+}
+
+.now-playing-label {
+  font-size: 0.7rem;
+  color: var(--gold);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.now-playing-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.35;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-shrink: 0;
+}
+
+.btn-control {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: rgba(201, 162, 39, 0.12);
+  color: var(--gold-light);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-control:hover:not(:disabled) {
+  background: rgba(201, 162, 39, 0.25);
+  transform: scale(1.06);
+  box-shadow: 0 0 16px var(--gold-glow);
+}
+
+.btn-control:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-control .icon-pause {
+  display: none;
+}
+
+.audio-player.playing .icon-play {
+  display: none;
+}
+
+.audio-player.playing .icon-pause {
+  display: inline;
+}
+
+.volume-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.volume-btn {
+  width: 40px;
+  height: 40px;
+  font-size: 1rem;
+}
+
+.volume-slider {
+  width: 76px;
+  height: 5px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 999px;
+  outline: none;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--gold);
+  cursor: pointer;
+  transition: transform 0.15s;
+  box-shadow: 0 0 8px var(--gold-glow);
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--gold);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 8px var(--gold-glow);
+}
+
+#audio {
+  display: none;
+}
+
+/* Ripple effect (triggered by JS; base for visual) */
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ripple .ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(201, 162, 39, 0.4);
+  transform: scale(0);
+  animation: ripple 0.5s ease-out;
+  pointer-events: none;
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Error / empty state */
+.loading p + .back-btn {
+  margin-top: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  :root {
+    --header-height: 130px;
+    --player-height: 80px;
+  }
+
+  .header {
+    padding: 1rem;
+  }
+
+  .logo-ar {
+    font-size: 1.35rem;
+  }
+
+  .logo-en {
+    font-size: 0.78rem;
+  }
+
+  .search-wrap.floating {
+    max-width: 100%;
+  }
+
+  .main {
+    padding: 1rem;
+  }
+
+  .reciters-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .surahs-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem;
+  }
+
+  .surah-card {
+    padding: 0.85rem;
+  }
+
+  .surah-card .number-circle {
+    width: 36px;
+    height: 36px;
+    font-size: 0.75rem;
+  }
+
+  .surah-card .name {
+    font-size: 0.88rem;
+  }
+
+  .player-outer {
+    width: calc(100% - 1.5rem);
+    bottom: 12px;
+  }
+
+  .audio-player.pill {
+    padding: 0 1.25rem 0 0.5rem;
+    min-height: var(--player-height);
+  }
+
+  .now-playing-title {
+    font-size: 0.82rem;
+  }
+
+  .btn-control {
+    width: 42px;
+    height: 42px;
+    font-size: 1.1rem;
+  }
+
+  .volume-slider {
+    width: 56px;
+  }
+}
+
+@media (max-width: 380px) {
+  .surahs-grid {
+    grid-template-columns: 1fr;
+  }
+}
